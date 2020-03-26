@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.jakewharton.rxbinding2.widget.RxTextView;
 
@@ -17,6 +18,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 
 public class MainActivity extends AppCompatActivity {
     ArrayAdapter<String> arrayAdapter;
+    TextView textViewExercise;
 
     @SuppressLint("CheckResult")
     @Override
@@ -42,7 +44,6 @@ public class MainActivity extends AppCompatActivity {
         // We can manipulate data as it's on the way o the subscriber.
         // For instance, we can disqualify data items based on certain conditions,
         // such as whether the string is at least three characters long.
-
         RxTextView.textChanges(editText)
                 .filter(text -> text.length() >= 3)
                 .debounce(150, TimeUnit.MILLISECONDS)
@@ -56,6 +57,16 @@ public class MainActivity extends AppCompatActivity {
          * execution while you wait for more input. Most operators don’t switch
          * the thread, but ones that are delayed do.
          */
+
+
+        /**
+         * Exercise
+         */
+        EditText editTextExercice = (EditText) findViewById(R.id.edit_text_exercise);
+        textViewExercise = (TextView) findViewById(R.id.text_view_exercise);
+        RxTextView.textChanges(editTextExercice)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(this::displayTextView);
     }
 
     private void clearSearchResults() {
@@ -71,5 +82,10 @@ public class MainActivity extends AppCompatActivity {
 
         arrayAdapter.clear();
         arrayAdapter.addAll(list);
+    }
+
+    private void displayTextView(CharSequence text) {
+        textViewExercise.setText(text.length() > 7 ? "Text too long" : "");
+
     }
 }
