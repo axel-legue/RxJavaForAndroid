@@ -20,27 +20,29 @@
         android:paddingRight="10dp"
         android:background="#fff"/>
 
-    <ListView
-        android:id="@+id/search_results"
-        android:layout_width="match_parent"
-        android:layout_height="196dp"
-        android:layout_marginTop="50dp"
-        android:background="#fff"/>
-
     <EditText
         android:id="@+id/edit_text_exercise"
         android:layout_width="match_parent"
-        android:layout_marginTop="50dp"
+        android:layout_marginTop="20dp"
         android:layout_height="40dp"
         android:paddingLeft="10dp"
         android:paddingRight="10dp"
         android:background="#fff"/>
+
+
+    <ListView
+        android:id="@+id/search_results"
+        android:layout_width="match_parent"
+        android:layout_height="196dp"
+        android:layout_marginTop="20dp"
+        android:background="#fff"/>
+
 
     <TextView
         android:id="@+id/text_view_exercise"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="#fff"
-        android:layout_marginTop="50dp"/>
+        android:layout_marginTop="20dp"/>
 
 </LinearLayout>

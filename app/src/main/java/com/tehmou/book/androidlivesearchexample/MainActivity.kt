@@ -8,9 +8,10 @@ import android.widget.ListView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.jakewharton.rxbinding2.widget.RxTextView
+import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.functions.BiFunction
 import java.util.*
-import java.util.concurrent.TimeUnit
 
 class MainActivity : AppCompatActivity() {
     private lateinit var arrayAdapter: ArrayAdapter<String>
@@ -24,41 +25,27 @@ class MainActivity : AppCompatActivity() {
         val listView = findViewById<ListView>(R.id.search_results)
         listView.adapter = arrayAdapter
 
-        /*
-         * The EditText "publishes" or "emits" an update, and the listener functions are subscribed to it.
-         * This makes the listener functions "subscribers"
-         *
-         * An EditText can be considered an emitter of string values over time.
-         * A producer like this in Rx terminology is called an "Observable" - because
-         * the values it emits can be observed
-         */
         val editText = findViewById<EditText>(R.id.edit_text)
-
-        // The subscriber doesn't know where the data comes from and when, or how man times.
-        // We can manipulate data as it's on the way o the subscriber.
-        // For instance, we can disqualify data items based on certain conditions,
-        // such as whether the string is at least three characters long.
-        RxTextView.textChanges(editText)
-                .filter { text -> text.length >= 3 }
-                .debounce(150, TimeUnit.MILLISECONDS)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe { text -> updateSearchResults(text) }
-
-        /* You’ve added a thread change in the middle, because you need to be
-         * sure that any operations that manipulate the UI are executed on the
-         * main thread. In this case, the debounce operator will automatically
-         * switch the thread to a background one in order to not block the
-         * execution while you wait for more input. Most operators don’t switch
-         * the thread, but ones that are delayed do.
-         */
-        /**
-         * Exercise
-         */
         val editTextExercice = findViewById<EditText>(R.id.edit_text_exercise)
         textViewExercise = findViewById(R.id.text_view_exercise)
-        RxTextView.textChanges(editTextExercice)
+
+
+        val input1: Observable<CharSequence> = RxTextView.textChanges(editText)
+        val input2: Observable<CharSequence> = RxTextView.textChanges(editTextExercice)
+        val combineEditTextObservable: Observable<CharSequence> =
+                Observable.combineLatest(
+                        input1,
+                        input2,
+                        BiFunction { t1: CharSequence, t2: CharSequence ->
+                            return@BiFunction "$t1 $t2"
+                        }
+                )
+
+        combineEditTextObservable
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe { text -> displayTextView(text) }
+                .subscribe(this::displayTextView)
+
+
     }
 
     private fun clearSearchResults() {
@@ -76,6 +63,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun displayTextView(text: CharSequence) {
-        textViewExercise.text = if (text.length > 7) "Text too long" else ""
+        textViewExercise.text = text
     }
 }
